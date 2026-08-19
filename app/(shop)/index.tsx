@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, ActivityIndicator, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, FlatList, ActivityIndicator, Image, ImageBackground, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useProducts } from '../../src/hooks/useProduct';
@@ -13,13 +13,30 @@ export default function ShopScreen() {
     const { data: apiProducts, isLoading, isError } = useProducts();
     const { items, addToCart, increaseQuantity, decreaseQuantity, totalItems } = useCartStore();
 
+    // Estado para la categoría seleccionada ('all' o la categoría específica)
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
     // Si la API falla o da error de red, usamos nuestra copia local de respaldo
     const products = (isError || !apiProducts || apiProducts.length === 0) ? MOCK_PRODUCTS : apiProducts;
+
+    // Filtrar productos según la categoría seleccionada
+    const filteredProducts = selectedCategory === 'all' 
+        ? products 
+        : products.filter(product => product.category.toLowerCase() === selectedCategory.toLowerCase());
 
     const getProductQuantity = (productId: number) => {
         const found = items.find((item) => item.id === productId);
         return found ? found.quantity : 0;
     };
+
+    // Categorías disponibles para los filtros
+    const categories = [
+        { label: 'All', value: 'all' },
+        { label: 'Men', value: "men's clothing" },
+        { label: 'Women', value: "women's clothing" },
+        { label: 'Jewelery', value: 'jewelery' },
+        { label: 'Electronics', value: 'electronics' },
+    ];
 
     const renderProductItem = ({ item }: { item: Product }) => {
         const quantity = getProductQuantity(item.id);
@@ -45,7 +62,7 @@ export default function ShopScreen() {
                                 style={styles.addButton} 
                                 onPress={() => addToCart(item)}
                             >
-                                <Text style={styles.addButtonText}>+ Añadir</Text>
+                                <Text style={styles.addButtonText}>+ Add</Text>
                             </TouchableOpacity>
                         ) : (
                             <View style={styles.counterContainer}>
@@ -71,50 +88,84 @@ export default function ShopScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar style="light" />
+        <ImageBackground 
+            source={require('../../assets/images/fondo-vino.jpg')} 
+            style={styles.background}
+            resizeMode="cover"
+        >
+            <SafeAreaView style={styles.container}>
+                <StatusBar style="light" />
 
-            {/* Encabezado con paleta Garnet */}
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/')} activeOpacity={0.7}>
-                    <Text style={styles.backButtonText}>← Inicio</Text>
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Catálogo de Moda</Text>
-                
-                <TouchableOpacity 
-                    style={styles.cartButton} 
-                    onPress={() => router.push('/(shop)/cart')}
-                    activeOpacity={0.7}
-                >
-                    <Text style={styles.cartButtonText}>🛒 {totalItems()}</Text>
-                </TouchableOpacity>
-            </View>
+                {/* Encabezado */}
+                <View style={styles.header}>
+                    <View style={styles.placeholderSpace} />
+                    <Text style={styles.headerTitle}>Product Catalog</Text>
+                    
+                    <TouchableOpacity 
+                        style={styles.cartButton} 
+                        onPress={() => router.push('/(shop)/cart')}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={styles.cartButtonText}>🛒 {totalItems()}</Text>
+                    </TouchableOpacity>
+                </View>
 
-            {/* Cuerpo principal */}
-            <View style={styles.content}>
-                {isLoading ? (
-                    <View style={styles.centerContainer}>
-                        <ActivityIndicator size="large" color="#e38792" />
-                        <Text style={styles.loadingText}>Cargando colección...</Text>
-                    </View>
-                ) : (
-                    <FlatList
-                        data={products}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={renderProductItem}
-                        contentContainerStyle={styles.listContainer}
-                        showsVerticalScrollIndicator={false}
-                    />
-                )}
-            </View>
-        </SafeAreaView>
+                {/* Barra de Filtros por Categoría */}
+                <View style={styles.filterContainer}>
+                    <ScrollView 
+                        horizontal 
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.filterScroll}
+                    >
+                        {categories.map((cat) => {
+                            const isSelected = selectedCategory === cat.value;
+                            return (
+                                <TouchableOpacity
+                                    key={cat.value}
+                                    style={[styles.filterChip, isSelected && styles.filterChipSelected]}
+                                    onPress={() => setSelectedCategory(cat.value)}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={[styles.filterText, isSelected && styles.filterTextSelected]}>
+                                        {cat.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </ScrollView>
+                </View>
+
+                {/* Cuerpo principal */}
+                <View style={styles.content}>
+                    {isLoading ? (
+                        <View style={styles.centerContainer}>
+                            <ActivityIndicator size="large" color="#e38792" />
+                            <Text style={styles.loadingText}>Loading collection...</Text>
+                        </View>
+                    ) : (
+                        <FlatList
+                            data={filteredProducts}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={renderProductItem}
+                            contentContainerStyle={styles.listContainer}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    )}
+                </View>
+            </SafeAreaView>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+    },
     container: {
         flex: 1,
-        backgroundColor: '#4e0a0b',
+        backgroundColor: 'transparent',
     },
     header: {
         flexDirection: 'row',
@@ -123,18 +174,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#681416',
+        borderBottomColor: 'rgba(104, 20, 22, 0.5)',
     },
-    backButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        backgroundColor: '#f2eee8',
-        borderRadius: 10,
-    },
-    backButtonText:{
-        color: '#4e0a0b',
-        fontSize: 13,
-        fontWeight: 'bold',
+    placeholderSpace: {
+        width: 40, 
     },
     headerTitle: {
         fontSize: 18,
@@ -151,6 +194,40 @@ const styles = StyleSheet.create({
     cartButtonText: {
         color: '#4e0a0b',
         fontSize: 14,
+        fontWeight: 'bold',
+    },
+    filterContainer: {
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(104, 20, 22, 0.3)',
+        backgroundColor: 'rgba(78, 10, 11, 0.4)', 
+    },
+    filterScroll: {
+        paddingHorizontal: 16,
+        alignItems: 'center',
+    },
+    filterChip: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        backgroundColor: '#f2eee8',
+        borderRadius: 20,
+        marginRight: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
+    },
+    filterChipSelected: {
+        backgroundColor: '#e38792',
+    },
+    filterText: {
+        color: '#4e0a0b',
+        fontSize: 13,
+        fontWeight: '600',
+    },
+    filterTextSelected: {
+        color: '#4e0a0b',
         fontWeight: 'bold',
     },
     content: {

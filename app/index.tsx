@@ -18,7 +18,7 @@ export default function WelcomeScreen() {
                     <View style={styles.contentContainer}>
                         <Text style={styles.brandTitle}>Mercatto ☼</Text>
                         <Text style={styles.brandSubtitle}>
-                            Todo lo que necesitas con la mejor calidad, hasta la puerta de tu hogar con sólamente un click. ☆⋆｡
+                            Everything you need with the best quality, right to your doorstep with just one click.
                         </Text>
 
                         <TouchableOpacity 
@@ -26,7 +26,7 @@ export default function WelcomeScreen() {
                             onPress={() => router.push('/(shop)')}
                             activeOpacity={0.8}
                         >
-                            <Text style={styles.shopButtonText}>Ir a la Tienda</Text>
+                            <Text style={styles.shopButtonText}>Go to the store</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
