@@ -5,21 +5,22 @@ import { StatusBar } from 'expo-status-bar';
 import { useProducts } from '../../src/hooks/useProduct';
 import { Product } from '../../src/types/product';
 import { useCartStore } from '../../src/store/useCartStore';
+import { MOCK_PRODUCTS } from '../../src/services/mockProduct';
 
 export default function ShopScreen() {
     const router = useRouter();
     
-    // Consumimos nuestro hook de TanStack Query y el store del carrito
-    const { data: products, isLoading, isError, error } = useProducts();
+    const { data: apiProducts, isLoading, isError } = useProducts();
     const { items, addToCart, increaseQuantity, decreaseQuantity, totalItems } = useCartStore();
 
-    // Función auxiliar para saber cuántas unidades de un producto específico hay en el carrito
+    // Si la API falla o da error de red, usamos nuestra copia local de respaldo
+    const products = (isError || !apiProducts || apiProducts.length === 0) ? MOCK_PRODUCTS : apiProducts;
+
     const getProductQuantity = (productId: number) => {
         const found = items.find((item) => item.id === productId);
         return found ? found.quantity : 0;
     };
 
-    // Renderizado de cada tarjeta de producto con controles rápidos y navegación al detalle
     const renderProductItem = ({ item }: { item: Product }) => {
         const quantity = getProductQuantity(item.id);
 
@@ -27,15 +28,17 @@ export default function ShopScreen() {
             <TouchableOpacity 
                 style={styles.productCard} 
                 onPress={() => router.push(`/(shop)/${item.id}`)}
-                activeOpacity={0.8}
+                activeOpacity={0.85}
             >
-                <Image source={{ uri: item.image }} style={styles.productImage} resizeMode="contain" />
+                <View style={styles.imageContainer}>
+                    <Image source={{ uri: item.image }} style={styles.productImage} resizeMode="contain" />
+                </View>
                 <View style={styles.productInfo}>
                     <Text style={styles.productCategory}>{item.category.toUpperCase()}</Text>
                     <Text style={styles.productTitle} numberOfLines={2}>{item.title}</Text>
                     <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
 
-                    {/* Controles rápidos de cantidad (+ / -) en el listado */}
+                    {/* Controles rápidos de cantidad (+ / -) */}
                     <View style={styles.cardActions} onStartShouldSetResponder={() => true}>
                         {quantity === 0 ? (
                             <TouchableOpacity 
@@ -71,14 +74,13 @@ export default function ShopScreen() {
         <SafeAreaView style={styles.container}>
             <StatusBar style="light" />
 
-            {/* Encabezado con título, botón de inicio e indicador del carrito */}
+            {/* Encabezado con paleta Garnet */}
             <View style={styles.header}>
                 <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/')} activeOpacity={0.7}>
                     <Text style={styles.backButtonText}>← Inicio</Text>
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Catálogo</Text>
+                <Text style={styles.headerTitle}>Catálogo de Moda</Text>
                 
-                {/* Botón flotante al carrito con indicador persistente */}
                 <TouchableOpacity 
                     style={styles.cartButton} 
                     onPress={() => router.push('/(shop)/cart')}
@@ -88,17 +90,12 @@ export default function ShopScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Cuerpo principal con estados de carga, error o lista */}
+            {/* Cuerpo principal */}
             <View style={styles.content}>
                 {isLoading ? (
                     <View style={styles.centerContainer}>
-                        <ActivityIndicator size="large" color="#f0d9e4" />
-                        <Text style={styles.loadingText}>Cargando productos...</Text>
-                    </View>
-                ) : isError ? (
-                    <View style={styles.centerContainer}>
-                        <Text style={styles.errorText}>Error al cargar:</Text>
-                        <Text style={styles.errorSubText}>{error?.message}</Text>
+                        <ActivityIndicator size="large" color="#e38792" />
+                        <Text style={styles.loadingText}>Cargando colección...</Text>
                     </View>
                 ) : (
                     <FlatList
@@ -117,7 +114,7 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#16131f',
+        backgroundColor: '#4e0a0b',
     },
     header: {
         flexDirection: 'row',
@@ -126,32 +123,33 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#201c29',
+        borderBottomColor: '#681416',
     },
     backButton: {
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#201c29',
+        backgroundColor: '#f2eee8',
         borderRadius: 10,
     },
-    backButtonText: {
-        color: '#f0d9e4',
-        fontSize: 14,
-        fontWeight: '600',
+    backButtonText:{
+        color: '#4e0a0b',
+        fontSize: 13,
+        fontWeight: 'bold',
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#f0d9e4',
+        color: '#f2eee8',
+        letterSpacing: 0.5,
     },
     cartButton: {
         paddingVertical: 8,
-        paddingHorizontal: 12,
-        backgroundColor: '#201c29',
+        paddingHorizontal: 14,
+        backgroundColor: '#e38792',
         borderRadius: 10,
     },
     cartButtonText: {
-        color: '#a78bfa',
+        color: '#4e0a0b',
         fontSize: 14,
         fontWeight: 'bold',
     },
@@ -165,63 +163,63 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     loadingText: {
-        color: '#c1a0ac',
+        color: '#f2eee8',
         marginTop: 12,
         fontSize: 14,
-    },
-    errorText: {
-        color: '#ff6b6b',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    errorSubText: {
-        color: '#c1a0ac',
-        fontSize: 12,
-        marginTop: 4,
-        textAlign: 'center',
     },
     listContainer: {
         paddingVertical: 16,
     },
     productCard: {
         flexDirection: 'row',
-        backgroundColor: '#201c29',
+        backgroundColor: '#f2eee8',
         borderRadius: 16,
         padding: 12,
         marginBottom: 16,
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {
+            width: 0,
+            height: 4
+        },
         shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 4,
+        shadowRadius: 5,
+        elevation: 5,
+    },
+    imageContainer: {
+        width: 80,
+        height: 80,
+        backgroundColor: '#ffffff',
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 14,
+        padding: 4,
     },
     productImage: {
-        width: 70,
-        height: 70,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        marginRight: 12,
+        width: '100%',
+        height: '100%',
     },
     productInfo: {
         flex: 1,
     },
     productCategory: {
         fontSize: 10,
-        color: '#c1a0ac',
-        fontWeight: '700',
+        color: '#9dad71',
+        fontWeight: '800',
         marginBottom: 4,
+        letterSpacing: 0.5,
     },
     productTitle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#f0d9e4',
+        color: '#4e0a0b',
         marginBottom: 6,
     },
     productPrice: {
-        fontSize: 15,
-        fontWeight: '800',
-        color: '#a78bfa',
+        fontSize: 16,
+        fontWeight: '900',
+        color: '#e38792',
         marginBottom: 8,
     },
     cardActions: {
@@ -229,36 +227,36 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     addButton: {
-        backgroundColor: '#a78bfa',
+        backgroundColor: '#4e0a0b',
         paddingVertical: 6,
-        paddingHorizontal: 12,
+        paddingHorizontal: 14,
         borderRadius: 8,
     },
     addButtonText: {
-        color: '#16131f',
+        color: '#f2eee8',
         fontSize: 12,
         fontWeight: 'bold',
     },
     counterContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#16131f',
+        backgroundColor: '#4e0a0b',
         borderRadius: 8,
         padding: 4,
     },
     counterButton: {
-        backgroundColor: '#201c29',
+        backgroundColor: '#e38792',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,
     },
     counterButtonText: {
-        color: '#f0d9e4',
+        color: '#4e0a0b',
         fontWeight: 'bold',
         fontSize: 14,
     },
     counterText: {
-        color: '#f0d9e4',
+        color: '#f2eee8',
         paddingHorizontal: 12,
         fontWeight: 'bold',
         fontSize: 14,

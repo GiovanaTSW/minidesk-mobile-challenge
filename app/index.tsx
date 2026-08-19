@@ -16,9 +16,9 @@ export default function WelcomeScreen() {
             <SafeAreaView style={styles.container}>
                 <View style={styles.overlay}>
                     <View style={styles.contentContainer}>
-                        <Text style={styles.brandTitle}>Sabrina's Closet ୨୧</Text>
+                        <Text style={styles.brandTitle}>Mercatto ☼</Text>
                         <Text style={styles.brandSubtitle}>
-                            La mejor moda para tu clóset, con la mejor calidad, hasta la puerta de tu hogar. ☆⋆｡
+                            Todo lo que necesitas con la mejor calidad, hasta la puerta de tu hogar con sólamente un click. ☆⋆｡
                         </Text>
 
                         <TouchableOpacity 
