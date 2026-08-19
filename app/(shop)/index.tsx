@@ -7,20 +7,24 @@ import { Product } from '../../src/types/product';
 
 export default function ShopScreen() {
     const router = useRouter();
-
-    //Consumimos el hook de TanStack Query
+    
+    // Consumimos nuestro hook de TanStack Query
     const { data: products, isLoading, isError, error } = useProducts();
 
-    //Renderizado de cada tarjeta de producto individual
+    // Renderizado de cada tarjeta de producto individual (Con navegación al detalle)
     const renderProductItem = ({ item }: { item: Product }) => (
-        <View style={styles.productCard}>
+        <TouchableOpacity 
+            style={styles.productCard} 
+            onPress={() => router.push(`/(shop)/${item.id}`)}
+            activeOpacity={0.8}
+        >
             <Image source={{ uri: item.image }} style={styles.productImage} resizeMode="contain" />
             <View style={styles.productInfo}>
                 <Text style={styles.productCategory}>{item.category.toUpperCase()}</Text>
                 <Text style={styles.productTitle} numberOfLines={2}>{item.title}</Text>
                 <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     return (
@@ -40,10 +44,10 @@ export default function ShopScreen() {
             <View style={styles.content}>
                 {isLoading ? (
                     <View style={styles.centerContainer}>
-                        <ActivityIndicator size='large' color="#f0d9e4" />
+                        <ActivityIndicator size="large" color="#f0d9e4" />
                         <Text style={styles.loadingText}>Cargando productos...</Text>
                     </View>
-                ): isError ? (
+                ) : isError ? (
                     <View style={styles.centerContainer}>
                         <Text style={styles.errorText}>Error al cargar:</Text>
                         <Text style={styles.errorSubText}>{error?.message}</Text>
