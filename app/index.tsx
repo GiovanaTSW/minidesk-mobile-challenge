@@ -1,62 +1,93 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
-import {StatusBar} from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar';
 
 export default function WelcomeScreen() {
     const router = useRouter();
 
     return (
-        <View style={styles.container}>
+        <ImageBackground 
+            source={require('../assets/images/welcome-bg.png')} // Aquí coloqué la ruta de la imagen de fondo
+            style={styles.background}
+            resizeMode="cover"
+        >
             <StatusBar style="light" />
-            <View style={styles.content}>
-                <Text style={styles.brand}>FakeStore</Text>
-                <Text style={styles.subtitle}>
-                    Soluciones especiales de primera calidad, entregadas en su puerta.
-                </Text>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.overlay}>
+                    <View style={styles.contentContainer}>
+                        <Text style={styles.brandTitle}>Sabrina's Closet ୨୧</Text>
+                        <Text style={styles.brandSubtitle}>
+                            La mejor moda para tu clóset, con la mejor calidad, hasta la puerta de tu hogar. ☆⋆｡
+                        </Text>
 
-                <TouchableOpacity style={styles.button} onPress={() => router.replace('/(shop)/')}>
-                    <Text style={styles.buttonText}>Ir a la Tienda</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                        <TouchableOpacity 
+                            style={styles.shopButton} 
+                            onPress={() => router.push('/(shop)')}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.shopButtonText}>Ir a la Tienda</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </SafeAreaView>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+    },
     container: {
         flex: 1,
-        backgroundColor: '#16131F',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
     },
-    content: {
-        padding: 24,
-        paddingBottom: 48,
-        backgroundColor: 'rgba(79, 22, 22, 0.85)',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+    overlay: {
+        width: '100%',
+        backgroundColor: 'rgba(78, 10, 11, 0.9)', // Garnet (#4e0a0b) en rgba para incluirle la opacidad
+        paddingHorizontal: 24,
+        paddingTop: 40,
+        paddingBottom: 50,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        borderTopWidth: 2,
+        borderTopColor: '#e38792', // Cotton candy
     },
-    brand: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#ffffff',
+    contentContainer: {
+        alignItems: 'flex-start',
+    },
+    brandTitle: {
+        fontSize: 34,
+        fontWeight: '900',
+        color: '#f2eee8', // Dusty white
         marginBottom: 8,
+        letterSpacing: 0.5,
     },
-    subtitle: {
-        fontSize: 16,
-        color: '#aaaaaa',
-        marginBottom: 24,
+    brandSubtitle: {
+        fontSize: 15,
+        color: '#e38792', // Cotton candy
         lineHeight: 22,
+        marginBottom: 30,
     },
-    button: {
-        backgroundColor: '#4f46e5',
+    shopButton: {
+        width: '100%',
+        backgroundColor: '#e38792', // Cotton candy
         paddingVertical: 16,
-        borderRadius: 12,
+        borderRadius: 14,
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 6,
     },
-    buttonText: {
-        color: '#ffffff',
+    shopButtonText: {
+        color: '#4e0a0b', // Garnet
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: 'bold',
+        letterSpacing: 0.5,
     },
 });

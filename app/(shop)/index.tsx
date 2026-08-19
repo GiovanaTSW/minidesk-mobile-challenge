@@ -4,40 +4,88 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useProducts } from '../../src/hooks/useProduct';
 import { Product } from '../../src/types/product';
+import { useCartStore } from '../../src/store/useCartStore';
 
 export default function ShopScreen() {
     const router = useRouter();
     
-    // Consumimos nuestro hook de TanStack Query
+    // Consumimos nuestro hook de TanStack Query y el store del carrito
     const { data: products, isLoading, isError, error } = useProducts();
+    const { items, addToCart, increaseQuantity, decreaseQuantity, totalItems } = useCartStore();
 
-    // Renderizado de cada tarjeta de producto individual (Con navegación al detalle)
-    const renderProductItem = ({ item }: { item: Product }) => (
-        <TouchableOpacity 
-            style={styles.productCard} 
-            onPress={() => router.push(`/(shop)/${item.id}`)}
-            activeOpacity={0.8}
-        >
-            <Image source={{ uri: item.image }} style={styles.productImage} resizeMode="contain" />
-            <View style={styles.productInfo}>
-                <Text style={styles.productCategory}>{item.category.toUpperCase()}</Text>
-                <Text style={styles.productTitle} numberOfLines={2}>{item.title}</Text>
-                <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
-            </View>
-        </TouchableOpacity>
-    );
+    // Función auxiliar para saber cuántas unidades de un producto específico hay en el carrito
+    const getProductQuantity = (productId: number) => {
+        const found = items.find((item) => item.id === productId);
+        return found ? found.quantity : 0;
+    };
+
+    // Renderizado de cada tarjeta de producto con controles rápidos y navegación al detalle
+    const renderProductItem = ({ item }: { item: Product }) => {
+        const quantity = getProductQuantity(item.id);
+
+        return (
+            <TouchableOpacity 
+                style={styles.productCard} 
+                onPress={() => router.push(`/(shop)/${item.id}`)}
+                activeOpacity={0.8}
+            >
+                <Image source={{ uri: item.image }} style={styles.productImage} resizeMode="contain" />
+                <View style={styles.productInfo}>
+                    <Text style={styles.productCategory}>{item.category.toUpperCase()}</Text>
+                    <Text style={styles.productTitle} numberOfLines={2}>{item.title}</Text>
+                    <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+
+                    {/* Controles rápidos de cantidad (+ / -) en el listado */}
+                    <View style={styles.cardActions} onStartShouldSetResponder={() => true}>
+                        {quantity === 0 ? (
+                            <TouchableOpacity 
+                                style={styles.addButton} 
+                                onPress={() => addToCart(item)}
+                            >
+                                <Text style={styles.addButtonText}>+ Añadir</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={styles.counterContainer}>
+                                <TouchableOpacity 
+                                    style={styles.counterButton} 
+                                    onPress={() => decreaseQuantity(item.id)}
+                                >
+                                    <Text style={styles.counterButtonText}>-</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.counterText}>{quantity}</Text>
+                                <TouchableOpacity 
+                                    style={styles.counterButton} 
+                                    onPress={() => increaseQuantity(item.id)}
+                                >
+                                    <Text style={styles.counterButtonText}>+</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </View>
+                </View>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar style="light" />
 
-            {/* Encabezado con título y botón de retorno */}
+            {/* Encabezado con título, botón de inicio e indicador del carrito */}
             <View style={styles.header}>
                 <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/')} activeOpacity={0.7}>
                     <Text style={styles.backButtonText}>← Inicio</Text>
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Catálogo de Productos</Text>
-                <View style={{ width: 60 }} />
+                <Text style={styles.headerTitle}>Catálogo</Text>
+                
+                {/* Botón flotante al carrito con indicador persistente */}
+                <TouchableOpacity 
+                    style={styles.cartButton} 
+                    onPress={() => router.push('/(shop)/cart')}
+                    activeOpacity={0.7}
+                >
+                    <Text style={styles.cartButtonText}>🛒 {totalItems()}</Text>
+                </TouchableOpacity>
             </View>
 
             {/* Cuerpo principal con estados de carga, error o lista */}
@@ -92,9 +140,20 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     headerTitle: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         color: '#f0d9e4',
+    },
+    cartButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        backgroundColor: '#201c29',
+        borderRadius: 10,
+    },
+    cartButtonText: {
+        color: '#a78bfa',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     content: {
         flex: 1,
@@ -163,5 +222,45 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '800',
         color: '#a78bfa',
+        marginBottom: 8,
+    },
+    cardActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    addButton: {
+        backgroundColor: '#a78bfa',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+    },
+    addButtonText: {
+        color: '#16131f',
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    counterContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#16131f',
+        borderRadius: 8,
+        padding: 4,
+    },
+    counterButton: {
+        backgroundColor: '#201c29',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    counterButtonText: {
+        color: '#f0d9e4',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    counterText: {
+        color: '#f0d9e4',
+        paddingHorizontal: 12,
+        fontWeight: 'bold',
+        fontSize: 14,
     },
 });
