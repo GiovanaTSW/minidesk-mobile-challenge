@@ -44,7 +44,7 @@ export default function ShopScreen() {
         return (
             <TouchableOpacity 
                 style={styles.productCard} 
-                onPress={() => router.push(`/(shop)/${item.id}`)}
+                onPress={() => router.push(`/(shop)/product/${item.id}`)}
                 activeOpacity={0.85}
             >
                 <View style={styles.imageContainer}>
@@ -99,7 +99,7 @@ export default function ShopScreen() {
                 {/* Encabezado */}
                 <View style={styles.header}>
                     <View style={styles.placeholderSpace} />
-                    <Text style={styles.headerTitle}>Product Catalog</Text>
+                    <Text style={styles.headerTitle}>Mercatto ☼︎</Text>
                     
                     <TouchableOpacity 
                         style={styles.cartButton} 

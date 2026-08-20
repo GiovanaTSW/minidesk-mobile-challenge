@@ -3,9 +3,9 @@ import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, ScrollVi
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../src/services/api';
-import { Product } from '../../src/types/product';
-import { useCartStore } from '../../src/store/useCartStore';
+import { api } from '../../../src/services/api';
+import { Product } from '../../../src/types/product';
+import { useCartStore } from '../../../src/store/useCartStore';
 
 export default function ProductDetailScreen() {
     const router = useRouter();
@@ -20,7 +20,7 @@ export default function ProductDetailScreen() {
 
     return (
         <ImageBackground 
-            source={require('../../assets/images/fondo-vino.jpg')} 
+            source={require('../../../assets/images/fondo-vino.jpg')} 
             style={styles.backgroundImage}
             resizeMode="cover"
         >
