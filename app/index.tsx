@@ -26,7 +26,7 @@ export default function WelcomeScreen() {
                             onPress={() => router.push('/(shop)')}
                             activeOpacity={0.8}
                         >
-                            <Text style={styles.shopButtonText}>Go to the store</Text>
+                            <Text style={styles.shopButtonText}>⋆.˚✮ Go to the store ✮˚.⋆</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

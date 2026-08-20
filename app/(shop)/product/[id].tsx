@@ -95,7 +95,7 @@ export default function ProductDetailScreen() {
                                         onPress={() => addToCart(product)}
                                         activeOpacity={0.8}
                                     >
-                                        <Text style={styles.addButtonText}>⋆.˚✮ Add to cart ✮˚.⋆</Text>
+                                        <Text style={styles.addButtonText}>⋆.˚✮ ADD TO CART ✮˚.⋆</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <View style={styles.counterWrapper}>
