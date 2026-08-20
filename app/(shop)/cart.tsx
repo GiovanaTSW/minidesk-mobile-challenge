@@ -103,7 +103,12 @@ export default function CartScreen() {
                                         <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
                                     </View>
 
-                                    <TouchableOpacity style={styles.paymentButton} activeOpacity={0.8}>
+                                    {/* Botón actualizado para navegar al Checkout */}
+                                    <TouchableOpacity 
+                                        style={styles.paymentButton} 
+                                        onPress={() => router.push('/checkout' as any)}
+                                        activeOpacity={0.8}
+                                    >
                                         <Text style={styles.paymentButtonText}> ⋆.˚✮ PROCEED TO PAYMENT ✮˚.⋆ </Text>
                                     </TouchableOpacity>
                                 </View>
@@ -224,7 +229,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    // Estilo del contador actualizado idéntico al de productos principales
     counterContainer: {
         flexDirection: 'row',
         alignItems: 'center',
