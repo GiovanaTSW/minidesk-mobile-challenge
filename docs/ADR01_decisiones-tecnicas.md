@@ -11,7 +11,7 @@ Prueba de demostración de habilidades técnicas para la empresa 'Minidesk'
 |--------|-------|
 | Autor  | Giovana Ruby Díaz Anduze |
 | Fecha  | 20/08/2026 |
-| Estado | `Propuesto` |
+| Estado | `Aceptado` |
 
 ---
 
@@ -150,5 +150,11 @@ La interfaz usa una paleta propia (granate `#4e0a0b` y rosa `#e38792`, bautizada
 - **Acceso directo a `/success` sin pasar por un checkout confirmado no está bloqueado.** El requisito 3.5 exige que no se pueda volver a un checkout ya procesado (resuelto con `router.replace`), pero no exige proteger el acceso directo a la confirmación — lo dejé así de forma consciente, no por descuido.
 
 - **Idioma de la interfaz:** se dejó en inglés en toda la aplicación. La Fake Store API devuelve los datos de productos (títulos, descripciones, categorías) en inglés, y traducir solo el texto propio de la UI mientras el contenido dinámico queda en inglés hubiera generado una mezcla inconsistente entre pantallas. Se priorizó esa consistencia por sobre adaptar el idioma al origen de la empresa (México), tal como pide el punto 4.6 del enunciado.
+
+---
+
+## Evidencias del proyecto
+
+Para evidencias del proyecto así es cómo se ven todas las vistas; sin embargo, para mejor visualización recomiendo observar las capturas en ⋆.˚✮ [`docs/evidence/`](./docs/evidence). ✮˚.⋆ y el video del flujo completo aquí: 🎥 [Ver video](https://www.canva.com/design/DAHS06yxVQA/XtN0gjJMWLmh2DqZuIKe8g/watch?utm_content=DAHS06yxVQA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hc0a7c3564a) ✮˚.⋆
 
 **↩ [Volver al README](../README.md)**

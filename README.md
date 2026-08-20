@@ -116,7 +116,7 @@ Todas las justificaciones pedidas en la sección 4 del enunciado (estado global,
 **Con más tiempo:**
 - Persistir el carrito con `zustand/middleware` (`persist` + AsyncStorage) para que sobreviva a un cierre de la app.
 - Tests unitarios para `useCartStore` y `useCartTotals` — son lógica de negocio pura, fáciles de testear sin depender de la UI.
-- Migrar el carrito de `items: CartItem[]` a un `Record<number, CartItem>` indexado por id — con 20 productos el costo de recorrer el array es imperceptible, pero si el catálogo creciera esta sería la optimización natural (ver detalle en `docs/ADR01-decisiones-tecnicas.md`).
+- Migrar el carrito de `items: CartItem[]` a un `Record<number, CartItem>` indexado por id — con 20 productos el costo de recorrer el array es imperceptible, pero si el catálogo creciera esta sería la optimización natural (ver detalle en `docs/ADR01_decisiones-tecnicas.md`).
 - Guard de navegación en `/success` para bloquear el acceso directo sin checkout confirmado.
 - Skeleton loaders en el catálogo en vez de un `ActivityIndicator` genérico.
 
@@ -124,6 +124,6 @@ Todas las justificaciones pedidas en la sección 4 del enunciado (estado global,
 
 ## Evidencias del proyecto
 
-Para evidencias del proyecto así es cómo se ven todas las vistas; sin embargo, para mejor visualización recomiendo observar las capturas y el video del flujo completo en ⋆.˚✮ [`docs/evidence/`](./docs/evidence). ✮˚.⋆
+Para evidencias del proyecto así es cómo se ven todas las vistas; sin embargo, para mejor visualización recomiendo observar las capturas en ⋆.˚✮ [`docs/evidence/`](./docs/evidence). ✮˚.⋆ y el video del flujo completo aquí: 🎥 [Ver video](https://www.canva.com/design/DAHS06yxVQA/XtN0gjJMWLmh2DqZuIKe8g/watch?utm_content=DAHS06yxVQA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hc0a7c3564a) ✮˚.⋆
 
 ![Mercatto](./docs/evidence/mercatto.png)
