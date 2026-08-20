@@ -103,7 +103,7 @@ Por último, el grupo de ruta `(shop)` agrupa las pantallas del flujo de tienda 
 
 Todas las justificaciones pedidas en la sección 4 del enunciado (estado global, navegación, cache, custom hooks, capa de datos, calidad general), además de las decisiones tomadas frente a requerimientos ambiguos, están documentadas en:
 
-**→ [`docs/ADR01-decisiones-tecnicas.md`](./docs/ADR01-decisiones-tecnicas.md)** ✮˚.⋆
+**→ [`docs/ADR01_decisiones-tecnicas.md`](./docs/ADR01_decisiones-tecnicas.md)** ✮˚.⋆
 
 ---
 
@@ -124,6 +124,6 @@ Todas las justificaciones pedidas en la sección 4 del enunciado (estado global,
 
 ## Evidencias del proyecto
 
-Para evidencias del proyecto así es cómo se ven todas las vistas; sin embargo, para mejor visualización recomiendo observar las capturas y el video del flujo completo en ⋆.˚✮ [`docs/evidencia/`](./docs/evidencia). ✮˚.⋆
+Para evidencias del proyecto así es cómo se ven todas las vistas; sin embargo, para mejor visualización recomiendo observar las capturas y el video del flujo completo en ⋆.˚✮ [`docs/evidence/`](./docs/evidence). ✮˚.⋆
 
-![alt text](mercatto.png)
+![Mercatto](./docs/evidence/mercatto.png)
