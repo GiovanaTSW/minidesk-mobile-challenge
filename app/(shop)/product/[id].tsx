@@ -10,13 +10,22 @@ import { useCartStore } from '../../../src/store/useCartStore';
 export default function ProductDetailScreen() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    const addToCart = useCartStore((state) => state.addToCart);
+    
+    // Obtenemos los métodos y los items del carrito
+    const { items, addToCart, increaseQuantity, decreaseQuantity } = useCartStore();
 
     const { data: product, isLoading, isError, error } = useQuery<Product, Error>({
         queryKey: ['product', id],
         queryFn: () => api.getProduct(Number(id)),
         enabled: !!id,
     });
+
+    // Calculamos el total de productos en el carrito para la insignia del icono
+    const totalCartItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+    // Buscamos si este producto ya está en el carrito para saber su cantidad actual
+    const cartItem = product ? items.find((item) => item.id === product.id) : undefined;
+    const quantity = cartItem ? cartItem.quantity : 0;
 
     return (
         <ImageBackground 
@@ -42,13 +51,21 @@ export default function ProductDetailScreen() {
                     </View>
                 ) : (
                     <>
-                        {/* Encabezado con botón de retorno */}
+                        {/* Encabezado con botón de retorno y acceso directo al carrito */}
                         <View style={styles.header}>
                             <TouchableOpacity style={styles.backButton} onPress={() => router.back()} activeOpacity={0.7}>
                                 <Text style={styles.backButtonText}> ← </Text>
                             </TouchableOpacity>
                             <Text style={styles.headerTitle} numberOfLines={1}>Mercatto ☼</Text>
-                            <View style={{ width: 70 }} />
+                            
+                            {/* Botón de acceso directo al carrito con la cantidad de productos */}
+                            <TouchableOpacity 
+                                style={styles.cartHeaderButton} 
+                                onPress={() => router.push('/cart' as any)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.cartHeaderIcon}>🛒 {totalCartItems}</Text>
+                            </TouchableOpacity>
                         </View>
 
                         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -71,17 +88,34 @@ export default function ProductDetailScreen() {
                                 <Text style={styles.sectionTitle}>Description</Text>
                                 <Text style={styles.productDescription}>{product.description}</Text>
 
-                                {/* Botón de Añadir al Carrito */}
-                                <TouchableOpacity 
-                                    style={styles.addButton} 
-                                    onPress={() => {
-                                        addToCart(product);
-                                        alert('Product added to cart!');
-                                    }}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={styles.addButtonText}>⋆.˚✮ Add to cart ✮˚.⋆</Text>
-                                </TouchableOpacity>
+                                {/* Sección dinámica: Botón Add to cart o Contador */}
+                                {quantity === 0 ? (
+                                    <TouchableOpacity 
+                                        style={styles.addButton} 
+                                        onPress={() => addToCart(product)}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Text style={styles.addButtonText}>⋆.˚✮ Add to cart ✮˚.⋆</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <View style={styles.counterWrapper}>
+                                        <View style={styles.counterContainer}>
+                                            <TouchableOpacity 
+                                                style={styles.counterButton} 
+                                                onPress={() => decreaseQuantity(product.id)}
+                                            >
+                                                <Text style={styles.counterButtonText}>-</Text>
+                                            </TouchableOpacity>
+                                            <Text style={styles.counterText}>{quantity}</Text>
+                                            <TouchableOpacity 
+                                                style={styles.counterButton} 
+                                                onPress={() => increaseQuantity(product.id)}
+                                            >
+                                                <Text style={styles.counterButtonText}>+</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                )}
                             </View>
                         </ScrollView>
                     </>
@@ -113,6 +147,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingVertical: 16,
+        paddingTop: 40,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255, 255, 255, 0.15)',
     },
@@ -121,6 +156,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         backgroundColor: '#f2eee8',
         borderRadius: 10,
+    },
+    cartHeaderButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        backgroundColor: '#e38792',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    cartHeaderIcon: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#4e0a0b',
     },
     backButtonSimple: {
         marginTop: 16,
@@ -136,7 +184,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 30,
         fontWeight: 'bold',
         color: '#f2eee8',
     },
@@ -214,6 +262,35 @@ const styles = StyleSheet.create({
         color: '#4e0a0b',
         fontSize: 15,
         fontWeight: 'bold',
+    },
+    counterWrapper: {
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    counterContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#4e0a0b',
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        justifyContent: 'center',
+        alignSelf: 'stretch',
+    },
+    counterButton: {
+        paddingHorizontal: 16,
+        paddingVertical: 4,
+    },
+    counterButtonText: {
+        color: '#f2eee8',
+        fontWeight: 'bold',
+        fontSize: 18,
+    },
+    counterText: {
+        color: '#f2eee8',
+        paddingHorizontal: 20,
+        fontWeight: 'bold',
+        fontSize: 16,
     },
     loadingText: {
         color: '#f2eee8',

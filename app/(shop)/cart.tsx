@@ -132,14 +132,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingVertical: 16,
+        paddingTop: 40,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(104, 20, 22, 0.5)',
     },
     backButton: {
-        paddingVertical: 6,
+        paddingVertical: 8,
         paddingHorizontal: 12,
         backgroundColor: '#f2eee8',
-        borderRadius: 8,
+        borderRadius: 10,
     },
     backButtonText: {
         color: '#4e0a0b',
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     headerTitle: {
-        fontSize: 20,
+        fontSize: 30,
         fontWeight: 'bold',
         color: '#f2eee8',
         letterSpacing: 0.5,

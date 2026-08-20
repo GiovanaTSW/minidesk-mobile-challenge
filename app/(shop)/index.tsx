@@ -172,7 +172,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        paddingVertical: 16,
+        paddingVertical: 20,
+        paddingTop: 40,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(104, 20, 22, 0.5)',
     },
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
         width: 40, 
     },
     headerTitle: {
-        fontSize: 25,
+        fontSize: 30,
         fontWeight: 'bold',
         color: '#f2eee8',
         letterSpacing: 0.5,
