@@ -10,8 +10,3 @@ export interface Product {
         count: number;
     };
 }
-
-export interface CartLine {
-    productId: number;
-    quantity: number;
-}

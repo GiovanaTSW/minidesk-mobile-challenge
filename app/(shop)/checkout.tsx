@@ -3,10 +3,11 @@ import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, ScrollView, Tex
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCartStore } from '../../src/store/useCartStore';
+import { useCartTotals } from '../../src/hooks/useCartTotals';
 
 export default function CheckoutScreen() {
   const router = useRouter();
-  const { items, clearCart } = useCartStore();
+  const clearCart = useCartStore((state) => state.clearCart);
 
   // Estados de Pago
   const [fullName, setFullName] = useState('');
@@ -20,11 +21,9 @@ export default function CheckoutScreen() {
   const [zipCode, setZipCode] = useState('');
   const [phone, setPhone] = useState('');
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = 0.0;
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
-  const totalItemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  // Mismo hook que usa cart.tsx: garantiza que el total mostrado aquí
+  // sea siempre igual al que el usuario vio en el resumen del carrito.
+  const { subtotal, tax, total, totalItems: totalItemsCount } = useCartTotals();
 
   const handleCancelOrder = () => {
     Alert.alert(
@@ -36,8 +35,10 @@ export default function CheckoutScreen() {
           text: 'OK',
           style: 'destructive',
           onPress: () => {
-            clearCart();
-            router.replace('/(shop)' as any);
+            // A diferencia del pago confirmado, cancelar NO debe vaciar
+            // el carrito: el usuario podría querer retomar su compra
+            // más tarde. Solo lo regresamos al catálogo.
+            router.replace('/(shop)');
           },
         },
       ],
@@ -52,7 +53,10 @@ export default function CheckoutScreen() {
     }
 
     clearCart();
-    router.replace('/success' as any);
+    // router.replace (no push): saca "checkout" del stack de navegación
+    // y lo sustituye por "success", así el usuario no puede volver con
+    // el botón atrás a un checkout ya procesado (requisito 3.5).
+    router.replace('/(shop)/success');
   };
 
   return (

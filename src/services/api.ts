@@ -1,5 +1,4 @@
 import { Product } from "../types/product";
-import { MOCK_PRODUCTS } from "./mockProduct";
 
 const BASE_URL = "https://fakestoreapi.com";
 
@@ -11,26 +10,12 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 export const api = {
-    getProducts: async(): Promise<Product[]> => {
-        try {
-            const res = await fetch(`${BASE_URL}/products`);
-            return await handleResponse<Product[]>(res);
-        } catch (error) {
-            console.warn("Falla de red en getProducts, usando mocks locales...", error);
-            return MOCK_PRODUCTS;
-        }
+    getProducts: async (): Promise<Product[]> => {
+        const res = await fetch(`${BASE_URL}/products`);
+        return handleResponse<Product[]>(res);
     },
     getProduct: async (id: number): Promise<Product> => {
-        try {
-            const res = await fetch(`${BASE_URL}/products/${id}`);
-            return await handleResponse<Product>(res);
-        } catch (error) {
-            console.warn(`Falla de red en getProduct(${id}), buscando en mocks locales...`, error);
-            const found = MOCK_PRODUCTS.find((p) => p.id === id);
-            if (!found) {
-                throw new Error("Producto no encontrado en el servidor ni en mocks locales.");
-            }
-            return found;
-        }
-    }
+        const res = await fetch(`${BASE_URL}/products/${id}`);
+        return handleResponse<Product>(res);
+    },
 };

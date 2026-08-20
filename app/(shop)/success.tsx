@@ -31,7 +31,7 @@ export default function SuccessScreen() {
 
   const handleBackToCatalog = () => {
     // Redirige al catálogo principal y reemplaza la vista para que no pueda regresar con el botón atrás
-    router.replace('/(shop)' as any);
+    router.replace('/(shop)');
   };
 
   return (

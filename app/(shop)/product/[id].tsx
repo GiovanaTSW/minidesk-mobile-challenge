@@ -2,34 +2,28 @@ import React from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image, ScrollView, ActivityIndicator, ImageBackground } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../../../src/services/api';
-import { Product } from '../../../src/types/product';
+import { useProduct } from '../../../src/hooks/useProduct';
+import { useCartItem } from '../../../src/hooks/useCartItem';
 import { useCartStore } from '../../../src/store/useCartStore';
+import { MOCK_PRODUCTS } from '../../../src/services/mockProduct';
+import { QuantityStepper } from '../../../src/components/QuantityStepper';
+import { OfflineBanner } from '../../../src/components/OfflineBanner';
 
 export default function ProductDetailScreen() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    
-    // Obtenemos los métodos y los items del carrito
-    const { items, addToCart, increaseQuantity, decreaseQuantity } = useCartStore();
+    const productId = Number(id);
 
-    const { data: product, isLoading, isError, error } = useQuery<Product, Error>({
-        queryKey: ['product', id],
-        queryFn: () => api.getProduct(Number(id)),
-        enabled: !!id,
-    });
+    const { data: apiProduct, isLoading, isError, error } = useProduct(productId);
+    const totalCartItems = useCartStore((state) => state.totalItems());
 
-    // Calculamos el total de productos en el carrito para la insignia del icono
-    const totalCartItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const product = isError ? MOCK_PRODUCTS.find((p) => p.id === productId) : apiProduct;
 
-    // Buscamos si este producto ya está en el carrito para saber su cantidad actual
-    const cartItem = product ? items.find((item) => item.id === product.id) : undefined;
-    const quantity = cartItem ? cartItem.quantity : 0;
+    const { quantity, increase, decrease } = useCartItem(productId);
 
     return (
-        <ImageBackground 
-            source={require('../../../assets/images/fondo-vino.jpg')} 
+        <ImageBackground
+            source={require('../../../assets/images/fondo-vino.jpg')}
             style={styles.backgroundImage}
             resizeMode="cover"
         >
@@ -41,27 +35,28 @@ export default function ProductDetailScreen() {
                         <ActivityIndicator size="large" color="#e38792" />
                         <Text style={styles.loadingText}>Loading product detail...</Text>
                     </View>
-                ) : isError || !product ? (
+                ) : !product ? (
                     <View style={styles.centerContainer}>
                         <Text style={styles.errorText}>Failed to load product.</Text>
-                        <Text style={styles.errorSubText}>{error?.message}</Text>
+                        <Text style={styles.errorSubText}>{error?.message ?? 'Product not found.'}</Text>
                         <TouchableOpacity style={styles.backButtonSimple} onPress={() => router.back()}>
                             <Text style={styles.backButtonText}>Back</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (
                     <>
+                        {isError && <OfflineBanner />}
+
                         {/* Encabezado con botón de retorno y acceso directo al carrito */}
                         <View style={styles.header}>
                             <TouchableOpacity style={styles.backButton} onPress={() => router.back()} activeOpacity={0.7}>
                                 <Text style={styles.backButtonText}> ← </Text>
                             </TouchableOpacity>
                             <Text style={styles.headerTitle} numberOfLines={1}>Mercatto ☼</Text>
-                            
-                            {/* Botón de acceso directo al carrito con la cantidad de productos */}
-                            <TouchableOpacity 
-                                style={styles.cartHeaderButton} 
-                                onPress={() => router.push('/cart' as any)}
+
+                            <TouchableOpacity
+                                style={styles.cartHeaderButton}
+                                onPress={() => router.push('/(shop)/cart')}
                                 activeOpacity={0.7}
                             >
                                 <Text style={styles.cartHeaderIcon}>🛒 {totalCartItems}</Text>
@@ -69,18 +64,15 @@ export default function ProductDetailScreen() {
                         </View>
 
                         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                            {/* Imagen destacada */}
                             <View style={styles.imageContainer}>
                                 <Image source={{ uri: product.image }} style={styles.productImage} resizeMode="contain" />
                             </View>
 
-                            {/* Información del producto */}
                             <View style={styles.infoContainer}>
                                 <Text style={styles.productCategory}>{product.category.toUpperCase()}</Text>
                                 <Text style={styles.productTitle}>{product.title}</Text>
                                 <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
 
-                                {/* Calificación */}
                                 <View style={styles.ratingContainer}>
                                     <Text style={styles.ratingText}> ✩ {product.rating.rate} ({product.rating.count} opinions)</Text>
                                 </View>
@@ -88,32 +80,22 @@ export default function ProductDetailScreen() {
                                 <Text style={styles.sectionTitle}>Description</Text>
                                 <Text style={styles.productDescription}>{product.description}</Text>
 
-                                {/* Sección dinámica: Botón Add to cart o Contador */}
                                 {quantity === 0 ? (
-                                    <TouchableOpacity 
-                                        style={styles.addButton} 
-                                        onPress={() => addToCart(product)}
+                                    <TouchableOpacity
+                                        style={styles.addButton}
+                                        onPress={() => increase(product)}
                                         activeOpacity={0.8}
                                     >
                                         <Text style={styles.addButtonText}>⋆.˚✮ ADD TO CART ✮˚.⋆</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <View style={styles.counterWrapper}>
-                                        <View style={styles.counterContainer}>
-                                            <TouchableOpacity 
-                                                style={styles.counterButton} 
-                                                onPress={() => decreaseQuantity(product.id)}
-                                            >
-                                                <Text style={styles.counterButtonText}>-</Text>
-                                            </TouchableOpacity>
-                                            <Text style={styles.counterText}>{quantity}</Text>
-                                            <TouchableOpacity 
-                                                style={styles.counterButton} 
-                                                onPress={() => increaseQuantity(product.id)}
-                                            >
-                                                <Text style={styles.counterButtonText}>+</Text>
-                                            </TouchableOpacity>
-                                        </View>
+                                        <QuantityStepper
+                                            quantity={quantity}
+                                            onIncrease={() => increase(product)}
+                                            onDecrease={decrease}
+                                            size="medium"
+                                        />
                                     </View>
                                 )}
                             </View>
@@ -266,31 +248,6 @@ const styles = StyleSheet.create({
     counterWrapper: {
         marginTop: 20,
         alignItems: 'center',
-    },
-    counterContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#4e0a0b',
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        justifyContent: 'center',
-        alignSelf: 'stretch',
-    },
-    counterButton: {
-        paddingHorizontal: 16,
-        paddingVertical: 4,
-    },
-    counterButtonText: {
-        color: '#f2eee8',
-        fontWeight: 'bold',
-        fontSize: 18,
-    },
-    counterText: {
-        color: '#f2eee8',
-        paddingHorizontal: 20,
-        fontWeight: 'bold',
-        fontSize: 16,
     },
     loadingText: {
         color: '#f2eee8',
